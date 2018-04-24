@@ -1,11 +1,15 @@
 package org.pucrs.data;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public interface DataConnection {
 	
-	public void connectBase( String connString );
+	public Connection connectBase( String connString ) throws SQLException;
 	
-	public void runQuery( String queryContent );
+	public ResultSet runQuery( String queryContent, Connection connect ) throws SQLException;
 
-	public void dataBaseFromCSV(String filePath);
+	public void flush( Connection connect ) throws SQLException;
 	
 }
