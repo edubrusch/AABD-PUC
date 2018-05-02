@@ -19,9 +19,13 @@ public class App
     public static void main( String[] args ) {
     	DataConnection test;
     	
-    	final String TmpTableName = "TMP_supah_table";
+    	final String TmpTableName = "TMP_TABLE";
     	
-    	String separator = ";";
+    	final int index_col_titulo = 22;
+    	
+    	final int index_col_titulo_reverse = 8;
+    	
+    	String separator = ",";
     	
     	String CommandCreate = 
     			"create table "+ TmpTableName + "(";    					
@@ -30,33 +34,34 @@ public class App
     			"insert into "+ TmpTableName +" values(";   	
     	
     	String SQLCommandEnd = 
-    			")";    	
+    			")";
+    	
+    	String carga = "";
     	
     	String filePath = 
-    			"C:\\Users\\E_Brusch\\";
+    			"C:\\SQL\\";
     	
     	String fileName = 
     			"Dados_Projeto.csv";
     	
-    	String SQLLite = 
-    			"jdbc:sqlite:C:/Users/E_Brusch/AADBPUCRS.db";
+    	String sqlLiteFilename = "AADBPUCRS.db";
     	
-    	/**
-    	 * Colocar username e password
-    	 * user=05109292;password=*****
-    	 * 
-    	 */
-    	String SQLServer = 
+    	String connectionString = 
+    			"jdbc:sqlite:"+filePath+sqlLiteFilename;
+    	
+    	/*
+    	 * String connectionString = 
     			"jdbc:sqlserver://sqlfacin:1433;databaseName=CRIAR;user=05109292;password=*****";        
-        
-    	String carga = "";
+        */
+    	
+    	
     	
     	try {
     		
     		
     		
     		test = new SQLLiteDataConnection();
-    		Connection cnt = test.connectBase(SQLLite);
+    		Connection cnt = test.connectBase(connectionString);
             
             File excel = new File(filePath+fileName);
             
@@ -87,9 +92,42 @@ public class App
             	
             	String[] lineData = line.split(separator);
             	
+            	if (lineData.length > columns.length) {
+            		
+            		System.out.println("\n\nfound instance where title is irregular did it work? ");
+            		
+            		String[] correctArray = new String[columns.length] ;
+            		String titulo_correto = "";
+            		
+            		for(int i = index_col_titulo; i< (lineData.length - index_col_titulo_reverse); i++ ) {
+            			
+            			titulo_correto += lineData[i];            			
+            		}
+            		
+            		lineData[index_col_titulo] = titulo_correto;
+            		
+            		int move = lineData.length - (index_col_titulo_reverse);
+            		
+            		for (int j = index_col_titulo+1; j <= lineData.length-1; j++) {
+            			
+            			lineData [j] = lineData[move];
+            			
+            			if(move < (lineData.length-1)) {
+            				
+            				move ++;
+            			}
+            		}
+            		
+            		for (int k = 0; k < correctArray.length;k++) {
+            			correctArray[k] = lineData[k];
+            		}
+            		lineData = null;
+            		lineData = correctArray;
+            	}
+            	
             	for(String cell : lineData) {
-            		carga += "'" + cell + "',";
-            	} 
+            		carga += "'" + cell.replace("\"", "") + "',";
+            	}
             	
             	carga = carga.substring(0, carga.length()-1);
             	            	
@@ -110,5 +148,6 @@ public class App
     			ex.printStackTrace();
     		}
         
+
     }
 }
